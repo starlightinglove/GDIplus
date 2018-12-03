@@ -19,10 +19,17 @@ public:
 public:
 
 	//방향키로 사각형 움직이기
-/**/
+	/*
 	int m_xPos, m_yPos;
 	int m_xMax, m_yMax;
 	BOOL m_bFill;
+	*/
+	
+	//글자 표시하기
+	/**/
+	CArray<TCHAR, TCHAR> m_str;
+	CArray<TCHAR, TCHAR>m_strTemp;
+	int m_nLine;
 
 	// 재정의입니다.
 public:
@@ -49,6 +56,9 @@ public:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnClose();
+	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 #ifndef _DEBUG  // KeyBoardView.cpp의 디버그 버전

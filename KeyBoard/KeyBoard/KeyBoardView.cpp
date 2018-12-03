@@ -27,6 +27,9 @@ BEGIN_MESSAGE_MAP(CKeyBoardView, CView)
 	ON_WM_KILLFOCUS()
 	ON_WM_SIZE()
 	ON_WM_KEYDOWN()
+	ON_WM_CREATE()
+	ON_WM_CLOSE()
+	ON_WM_CHAR()
 END_MESSAGE_MAP()
 
 // CKeyBoardView 생성/소멸
@@ -36,8 +39,10 @@ CKeyBoardView::CKeyBoardView() noexcept
 	// TODO: 여기에 생성 코드를 추가합니다.
 
 	//방향키로 사각형 움직이기
+	/*
 	m_xPos = m_yPos = 60;
 	m_bFill = FALSE;
+	*/
 }
 
 CKeyBoardView::~CKeyBoardView()
@@ -94,15 +99,35 @@ void CKeyBoardView::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: 여기에 메시지 처리기 코드를 추가합니다.
 					   // 그리기 메시지에 대해서는 CView::OnPaint()을(를) 호출하지 마십시오.
+	//방향키로 사각형 움직이기
+	/*
 	CBrush brush, *pOldBrush;
 	if (m_bFill == TRUE) {
-		brush.CreateSolidBrush(RGB(rand() % 256, rand() % 256, Rand() % 256));
+		brush.CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
 		pOldBrush = dc.SelectObject(&brush);
 	}
 	dc.Rectangle(m_xPos - 20, m_yPos - 20, m_xPos + 20, m_yPos + 20);
 
 	if (m_bFill)
 		dc.SelectObject(pOldBrush);
+		*/
+
+	//글자 표시하기
+	/**/
+	//화면 출력용 폰트를 선택한다.
+	CFont font;
+	font.CreatePointFont(150, _T("Arial"));
+	dc.SelectObject(&font);
+
+	//현재까지 입력된 글자들을 화면에 출력한다.
+	CRect rect;
+	GetClientRect(&rect);
+	dc.DrawText(m_str.GetData(), m_str.GetSize(), &rect, DT_LEFT);
+	SIZE sizex, sizey;
+	::GetTextExtentPoint(dc.m_hDC, m_strTemp.GetData(), m_strTemp.GetSize(), &sizex);
+	::GetTextExtentPoint(dc.m_hDC, m_str.GetData(), m_str.GetSize(), &sizey);
+	SetCaretPos(CPoint(sizex.cx, m_nLine*sizey.cy));
+
 }
 
 
@@ -142,9 +167,10 @@ void CKeyBoardView::OnSize(UINT nType, int cx, int cy)
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 
 	//방향키로 사각형 움직이기
-
+	/*
 	m_xMax = cx;
 	m_yMax = cy;
+	*/
 }
 
 
@@ -153,7 +179,7 @@ void CKeyBoardView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
 	//방향키로 사각형 움직이기
-
+	/*
 	switch (nChar) {
 	case VK_LEFT:
 		m_xPos -= 20;
@@ -176,4 +202,68 @@ void CKeyBoardView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	Invalidate(FALSE);
 
 	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+	*/
+}
+
+
+int CKeyBoardView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+
+	//글자 표시하기
+	/**/
+	CreateSolidCaret(20, 20); //캐럿을 생성한다.
+	SetCaretPos(CPoint(50, 50));
+	ShowCaret();
+	m_nLine = 0;
+
+	return 0;
+}
+
+
+void CKeyBoardView::OnClose()
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	//글자 표시하기
+	/**/
+	HideCaret(); //캐럿을 숨긴다.
+	::DestroyCaret(); //캐럿을 파괴한다
+
+	CView::OnClose();
+}
+
+
+void CKeyBoardView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	//글자 표시하기
+	/**/
+	//Backspace 입력시 맨 마지막 글자를 삭제한다.
+	if (nChar == VK_BACK) {
+		if (m_str.GetSize() > 0) {
+			m_str.RemoveAt(m_str.GetSize() - 1);
+			m_strTemp.RemoveAt(m_strTemp.GetSize() - 1);
+		}
+	}
+	else if (nChar == VK_RETURN) {
+		CClientDC dc(this);
+		m_nLine++;
+		m_str.Add(nChar);
+		m_strTemp.RemoveAll();
+	}
+	//그 밖의 경우에는 동적 배열에 글자를 추가한다.
+	else {
+		m_str.Add(nChar);
+		m_strTemp.Add(nChar);
+	}
+	//화면을 갱신한다.
+	Invalidate();
+
+
+	CView::OnChar(nChar, nRepCnt, nFlags);
 }
