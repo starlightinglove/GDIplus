@@ -19,6 +19,11 @@ class CKeyBoardApp : public CWinApp
 public:
 	CKeyBoardApp() noexcept;
 
+	//방향키로 사각형 움직이기
+	/**/
+	int m_xPos, m_yPos;
+	int m_xMax, m_yMax;
+	BOOL m_bFill;
 
 // 재정의입니다.
 public:
